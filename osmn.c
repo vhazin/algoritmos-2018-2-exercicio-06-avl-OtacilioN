@@ -1,64 +1,66 @@
 #include <stdio.h>
 
-#define MAX_ARRAY 101
+#define MAX_ARRAY 102
+#define LESS_UNBALANCED_TREE 4
 
-int checkBalance(int left, int right, int bst[MAX_ARRAY], int leftIndice);
+int getFatherHeight(int left, int right, int nodeHeight[MAX_ARRAY], int leftIndice);
 
 int main(void)
 {
-    int tests, elements, leftLeave, rightLeave, tmptest;
+    int tests, elements, node, iterator;
     scanf("%d", &tests);
     while (tests--)
     {
-        int bst[MAX_ARRAY] = {0};
+        int nodeHeight[MAX_ARRAY] = {0};
+        int bsts[MAX_ARRAY];
+        int flag = 0;
         scanf("%d", &elements);
-        tmptest = elements;
-        if (elements < 2)
+        if (elements < LESS_UNBALANCED_TREE)
         {
-            scanf("%d", &leftLeave);
+            while (elements--)
+            {
+                scanf("%d", &node);
+            }
             printf("T\n");
             continue;
         }
+
+        for (iterator = 0; iterator < elements; iterator++)
+        {
+            scanf("%d", &bsts[iterator]);
+            if (bsts[iterator] < 0)
+                nodeHeight[iterator] = -1;
+        }
+
         if (!(elements % 2)) // If it is pair
         {
-            scanf("%d", &leftLeave);
-            bst[elements - 1] = -1;
             elements--;
+            nodeHeight[((elements - 1) / 2)] = 1;
         }
         while (elements-- > 1)
         {
-            scanf("%d", &leftLeave);
-            scanf("%d", &rightLeave);
             elements--;
-            bst[((elements - 1) / 2)] = checkBalance(leftLeave, rightLeave, bst, elements);
+            if (nodeHeight[((elements - 1) / 2)] >= 0)
+                nodeHeight[((elements - 1) / 2)] = getFatherHeight(bsts[elements], bsts[elements + 1], nodeHeight, elements);
 
-            printf("elements %d %d\n", bst[((elements - 1) / 2)], ((elements - 1) / 2));
-
-            if (bst[((elements - 1) / 2)] > 1 || bst[((elements - 1) / 2)] < -1)
+            if (nodeHeight[elements + 1] - nodeHeight[elements] > 1 || nodeHeight[elements + 1] - nodeHeight[elements] < -1)
             {
                 printf("F\n");
+                flag++;
                 break;
             }
         }
-        int x;
-        for (x = 0; x < tmptest; x++)
-            printf("%d|%d ", bst[x], tmptest);
-        if (bst[((elements - 1) / 2)] > 1 || bst[((elements - 1) / 2)] < -1)
-            printf("F\n");
-        else
+        if (!flag)
             printf("T\n");
     }
     return 0;
 }
 
-int checkBalance(int left, int right, int bst[MAX_ARRAY], int leftIndice)
+int getFatherHeight(int left, int right, int nodeHeight[MAX_ARRAY], int leftIndice)
 {
     int result = 0;
-    result = bst[leftIndice + 1] - bst[leftIndice];
-    if (left < 0)
-        result--;
-    if (right < 0)
+    result = nodeHeight[leftIndice + 1] > nodeHeight[leftIndice] ? nodeHeight[leftIndice + 1] : nodeHeight[leftIndice];
+    if (result || left > 0 || right > 0) // If has child sum +1
         result++;
-    printf("Result %d ", result);
     return result;
 }
